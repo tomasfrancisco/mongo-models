@@ -58,6 +58,79 @@ lab.experiment('MongoModels DB Connection', () => {
 });
 
 
+lab.experiment('MongoModels Construction', () => {
+
+    lab.test('it constructs an instance using the schema', (done) => {
+
+        const WithSchema = class extends MongoModels {};
+
+        WithSchema.constructWithSchema = true;
+
+        WithSchema.schema = Joi.object().keys({
+            name: Joi.string().required(),
+            stuff: Joi.object().keys({
+                foo: Joi.string().default('foozball'),
+                bar: Joi.string().default('barzball'),
+                baz: Joi.string().default('bazzball')
+            }).default(() => {
+
+                return {
+                    foo: 'llabzoof',
+                    bar: 'llabzrab',
+                    baz: 'llabzzab'
+                };
+            }, 'default stuff')
+        });
+
+        const instance1 = new WithSchema({
+            name: 'Stimpson J. Cat'
+        });
+
+        Code.expect(instance1.name).to.equal('Stimpson J. Cat');
+        Code.expect(instance1.stuff).to.be.an.object();
+        Code.expect(instance1.stuff.foo).to.equal('llabzoof');
+        Code.expect(instance1.stuff.bar).to.equal('llabzrab');
+        Code.expect(instance1.stuff.baz).to.equal('llabzzab');
+
+        const instance2 = new WithSchema({
+            name: 'Stimpson J. Cat',
+            stuff: {
+                foo: 'customfoo'
+            }
+        });
+
+        Code.expect(instance2.name).to.equal('Stimpson J. Cat');
+        Code.expect(instance2.stuff).to.be.an.object();
+        Code.expect(instance2.stuff.foo).to.equal('customfoo');
+        Code.expect(instance2.stuff.bar).to.equal('barzball');
+        Code.expect(instance2.stuff.baz).to.equal('bazzball');
+
+        done();
+    });
+
+
+    lab.test('it throws if validation fails when creating an instance using the schema', (done) => {
+
+        const BoomSchema = class extends MongoModels {};
+
+        BoomSchema.constructWithSchema = true;
+
+        BoomSchema.schema = Joi.object().keys({
+            name: Joi.string().required()
+        });
+
+        const throws = function () {
+
+            return new BoomSchema({});
+        };
+
+        Code.expect(throws).to.throw();
+
+        done();
+    });
+});
+
+
 lab.experiment('MongoModels Validation', () => {
 
     lab.test('it returns the Joi validation results of a SubClass', (done) => {

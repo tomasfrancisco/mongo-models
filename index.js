@@ -8,6 +8,17 @@ const Mongodb = require('mongodb');
 class MongoModels {
     constructor(attrs) {
 
+        if (this.constructor.constructWithSchema) {
+            this.constructor.validate(attrs, (err, value) => {
+
+                if (err) {
+                    throw err;
+                }
+
+                attrs = value;
+            });
+        }
+
         Object.assign(this, attrs);
     }
 
