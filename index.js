@@ -12,17 +12,20 @@ class MongoModels {
     }
 
 
-    static connect(uri, options, callback) {
+    static connect(uri, options) {
 
-        Mongodb.MongoClient.connect(uri, options, (err, db) => {
+        return new Promise((resolve, reject) => {
 
-            if (err) {
-                return callback(err);
-            }
+            Mongodb.MongoClient.connect(uri, options, (err, db) => {
 
-            MongoModels.db = db;
+                if (err) {
+                    return reject(err);
+                }
 
-            callback(null, db);
+                MongoModels.db = db;
+
+                resolve(db);
+            });
         });
     }
 
@@ -45,15 +48,35 @@ class MongoModels {
     }
 
 
-    static validate(input, callback) {
+    static validate(input) {
 
-        return Joi.validate(input, this.schema, callback);
+        return new Promise((resolve, reject) => {
+
+            Joi.validate(input, this.schema, (err, value) => {
+
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve(value);
+            });
+        });
     }
 
 
-    validate(callback) {
+    validate() {
 
-        return Joi.validate(this, this.constructor.schema, callback);
+        return new Promise((resolve, reject) => {
+
+            Joi.validate(this, this.constructor.schema, (err, value) => {
+
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve(value);
+            });
+        });
     }
 
 

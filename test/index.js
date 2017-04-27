@@ -20,15 +20,19 @@ lab.experiment('MongoModels DB Connection', () => {
 
     lab.test('it connects and disconnects the database', (done) => {
 
-        MongoModels.connect(Config.mongodb.uri, Config.mongodb.options, (err, db) => {
+        MongoModels.connect(Config.mongodb.uri, Config.mongodb.options)
+        .then((db) => {
 
-            Code.expect(err).to.not.exist();
             Code.expect(db).to.be.an.object();
 
             Code.expect(MongoModels.db.serverConfig.isConnected()).to.equal(true);
             MongoModels.disconnect();
             Code.expect(MongoModels.db.serverConfig.isConnected()).to.equal(false);
+            done();
+        })
+        .catch((err) => {
 
+            Code.expect(err).to.not.exist();
             done();
         });
     });
@@ -45,13 +49,15 @@ lab.experiment('MongoModels DB Connection', () => {
             }
         };
 
-        MongoModels.connect(Config.mongodb.uri, Config.mongodb.options, (err, db) => {
+        MongoModels.connect(Config.mongodb.uri, Config.mongodb.options)
+        .then((db) => {
+
+            Code.expect(db).to.not.exist();
+            done();
+        }).catch((err) => {
 
             Code.expect(err).to.be.an.object();
-            Code.expect(db).to.not.exist();
-
             stub.mongodb.MongoClient = realMongoClient;
-
             done();
         });
     });
@@ -224,7 +230,11 @@ lab.experiment('MongoModels Indexes', () => {
 
         SubModel.collection = 'submodels';
 
-        MongoModels.connect(Config.mongodb.uri, Config.mongodb.options, (err, db) => {
+        MongoModels.connect(Config.mongodb.uri, Config.mongodb.options)
+        .then((db) => {
+
+            done();
+        }).catch((err) => {
 
             done(err);
         });
@@ -295,12 +305,15 @@ lab.experiment('MongoModels Paged Find', () => {
 
         SubModel.collection = 'submodels';
 
-        MongoModels.connect(Config.mongodb.uri, Config.mongodb.options, (err, db) => {
+        MongoModels.connect(Config.mongodb.uri, Config.mongodb.options)
+        .then((db) => {
+
+            done();
+        }).catch((err) => {
 
             done(err);
         });
     });
-
 
     lab.after((done) => {
 
@@ -464,7 +477,11 @@ lab.experiment('MongoModels Proxied Methods', () => {
 
         SubModel.collection = 'submodels';
 
-        MongoModels.connect(Config.mongodb.uri, Config.mongodb.options, (err, db) => {
+        MongoModels.connect(Config.mongodb.uri, Config.mongodb.options)
+        .then((db) => {
+
+            done();
+        }).catch((err) => {
 
             done(err);
         });
